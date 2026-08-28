@@ -5,15 +5,17 @@ import { Nav } from '../layout/nav/nav';
 import { AccountService } from '../core/services/account-service';
 import { Home } from "../features/home/home";
 import { User } from '../types/user';
+import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [Nav, Home],
+  imports: [Nav, RouterOutlet],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
 export class App implements OnInit {
   private accountService = inject(AccountService);
+  protected router = inject(Router);
   private http = inject(HttpClient);
   protected readonly title = 'Dating App';
   protected members = signal<User[]>([]);
@@ -25,10 +27,11 @@ export class App implements OnInit {
 
   setCurrentUser() {
     const userString = localStorage.getItem('user');
-    if (userString) {
+    if (!userString) return;
+
       const user = JSON.parse(userString);
       this.accountService.currentUser.set(user);
-    }
+
   }
 
   async getMembers() {
