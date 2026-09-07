@@ -30,6 +30,11 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
         return await context.SaveChangesAsync() > 0;
     }
 
+    public void DeletePhoto(Photo photo)
+    {
+        context.Photos.Remove(photo);
+    }
+
     public void Update(Member member)
     {
         context.Entry(member).State = EntityState.Modified;
@@ -39,6 +44,7 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
     {
         return await context.Members
             .Include(m => m.User)
+            .Include(m => m.Photos)
             .SingleOrDefaultAsync(m => m.Id == id);
     }
 }
