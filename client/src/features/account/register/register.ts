@@ -7,7 +7,7 @@ import { TextInput } from '../../../shared/text-input/text-input';
 import { Router } from '@angular/router';
 
 @Component({
-  imports: [ReactiveFormsModule, JsonPipe, TextInput],
+  imports: [ReactiveFormsModule, TextInput],
   selector: 'app-register',
   styleUrl: './register.css',
   templateUrl: './register.html',

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using API.Entities;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace API.Data
 {
@@ -13,6 +15,24 @@ namespace API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+            foreach(var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach(var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime))
+                    {
+                        property.SetValueConverter(dateTimeConverter);
+                    }
+                }
+            }
+
             modelBuilder.Entity<AppUser>()
                 .HasOne(u => u.Member)
                 .WithOne(m => m.User)
