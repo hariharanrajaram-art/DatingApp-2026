@@ -1,5 +1,5 @@
 import { HttpEvent, HttpInterceptorFn, HttpParams } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, KeyValueDiffers } from '@angular/core';
 import { BusyService } from '../services/busy-service';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { delay } from 'rxjs/internal/operators/delay';
@@ -14,7 +14,21 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     return paramString ? `${url}?${paramString}` : url;
   }
 
+  const invalidateCache = (urlPattern: string) => {
+    for(const key of cache.keys()) {
+      if(key.includes(urlPattern)) {
+        cache.delete(key);
+        console.log('Cache invalidated for: ${key}');
+      }
+    }
+  }
+
   const cacheKey = generateCacheKey(req.url, req.params);
+
+  if(req.method.includes('POST') && req.url.includes('/likes')) {
+    invalidateCache('/likes');
+  }
+
    if (req.method === 'GET') {
      const cachedResponse = cache.get(cacheKey);
      if (cachedResponse) {
